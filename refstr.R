@@ -14,10 +14,22 @@ length_alternate <- nchar(vcf_cols$ALT)
 length_reference [grep("[.]", vcf_cols$REF)] <- 0
 length_alternate [grep("[.]", vcf_cols$ALT)] <- 0
 
-frameshifts <- ength_alternate - length_reference
+frameshifts <- length_alternate - length_reference
+table(frameshifts) # do we want to provide a text summary of frameshits detected?
+# % subs + threshold of frameshifts could be warnings for new assembly / variant calling
 
+#initialise new sequence
+new_sequence <- reference
+#substitute new variants into fasta sequence
 for(ii in 1:nrow(vcf_cols)){
-  
+  if(length(reference)>0){ #substitutions and deletions
+    new_sequence[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)] <- vcf_cols$ALT[ii])
+    print(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)], "substituted for", vcf_cols$ALT[ii])
+  } else { #insertions
+    new_sequence[vcf_cols$POS[ii]-1] <- paste(reference[vcf_cols$POS[ii]-1], vcf_cols$ALT[ii])
+  }
 }
 
 head(vcf_cols)
+
+Sys.getenv('3') #output name from bash
