@@ -22,8 +22,8 @@ table(frameshifts) # do we want to provide a text summary of frameshits detected
 new_sequence <- reference
 #substitute new variants into fasta sequence
 for(ii in 1:nrow(vcf_cols)){
-  new_sequence[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)] <- vcf_cols$ALT[ii])
-  print(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)], "substituted for", vcf_cols$ALT[ii])
+  new_sequence[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)] <- vcf_cols$ALT[ii]
+  print(paste(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)], "substituted for", vcf_cols$ALT[ii]))
 }
 
 head(vcf_cols)
