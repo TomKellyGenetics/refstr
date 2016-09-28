@@ -1,7 +1,7 @@
 #load input data
 args = commandArgs(trailingOnly=TRUE)
 reference <- readLines("reference_string.txt")
-vcf_cols <- data.table::fread("output.txt", data.table = F)
+vcf_cols <- data.table::fread("output.tsv", data.table = F)
 
 #split reference string into character vector
 reference <- strsplit(reference, split="")[[1]]
@@ -45,4 +45,6 @@ new_sequence <- paste(new_sequence, collapse='')
 length(new_sequence)
 nchar(new_sequence)
 
-args[3] #output name from bash
+#args[3] #output name from bash
+writeLines(new_sequence, con = paste0(args[3], "_string.txt"))
+
