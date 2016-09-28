@@ -6,9 +6,9 @@ echo $1
 
 #define intermediate file names
 reference_string=$(echo $2 | sed -e "s/.fasta/_string.txt/")
-echo $reference_string
+#echo $reference_string
 input_tsv=$(echo $1 | sed -e "s/.vcf/.tsv/")
-echo $input_tsv
+#echo $input_tsv
 
 #tail removes header, sed removes lines breaks
 #tail -n +2 $reference_string > $reference_string
