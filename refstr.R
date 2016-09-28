@@ -24,7 +24,7 @@ new_sequence <- reference
 #substitute new variants into fasta sequence
 for(ii in 1:nrow(vcf_cols)){
   new_sequence[vcf_cols$POS[ii]] <- vcf_cols$ALT[ii]
-  if(length_reference>1) new_sequence[(vcf_cols$POS[ii]+1):(vcf_cols$POS[ii]+length_reference[ii]-1)] <- NA
+  if(length_reference[ii]>1) new_sequence[(vcf_cols$POS[ii]+1):(vcf_cols$POS[ii]+length_reference[ii]-1)] <- NA
   print(paste(paste(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)], collapse=""), "substituted for", vcf_cols$ALT[ii]))
 }
 
