@@ -24,19 +24,28 @@ frameshifts <- length_alternate - length_reference
 # % subs + threshold of frameshifts could be warnings for new assembly / variant calling
 
 #initialise cluster
-cl<-makeSOCKcluster(2)
-clusterExport(cl=cl, list=c("vcf_cols", "reference", "length_reference"))
+cl<-makeSOCKcluster(2) #number of cores
+new_sequence <- reference
+clusterExport(cl=cl, list=c("vcf_cols", "reference", "length_reference", "new_sequence"))
 
-new_sequence <- parLapply(cl, as.list(1:length(reference), function(jj){ # run in parallel
-  if(any(jj == vcf_col$POS)){
-    ii <- grep(jj, vcf_col$POS)
+#substitute variants in parallel
+new_sequence <- parLapply(cl, as.list(1:length(reference)), function(jj){ # run in parallel
+  if(any(jj == vcf_cols$POS)){
+    ii <- grep(jj, vcf_cols$POS)
     new_sequence[vcf_cols$POS[ii]] <- vcf_cols$ALT[ii]
-    if(length_reference[ii]>1) new_sequence[(vcf_cols$POS[ii]+1):(vcf_cols$POS[ii]+length_reference[ii]-1)] <- NA
     print(paste(paste(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)], collapse=""), "substituted for", vcf_cols$ALT[ii]))
   } else {
     new_sequence[jj] <- reference[jj]
   }
 }) 
+stopCluster()
+
+#remove frameshifted variants (serial)
+lapply(1:nrow(vcf_cols), function(ii){
+  if(length_reference[ii]>1) new_sequence[(vcf_cols$POS[ii]+1):(vcf_cols$POS[ii]+length_reference[ii]-1)] <- NA
+  print(paste(paste(reference[vcf_cols$POS[ii]+1:(vcf_cols$POS[ii]+length_reference[ii]-1)], collapse=""), "removed by indel"))
+})
+
 
 #initialise new sequence
 new_sequence <- reference
