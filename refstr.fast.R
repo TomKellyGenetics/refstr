@@ -47,5 +47,5 @@ length(new_sequence)
 nchar(new_sequence)
 
 #args[3] #output name from bash
-readr::write_lines(new_sequence, con = paste0(args[3], "_string.txt"))
+readr::write_lines(new_sequence, path = paste0(args[3], "_string.txt"))
 
