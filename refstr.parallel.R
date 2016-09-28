@@ -25,38 +25,23 @@ frameshifts <- length_alternate - length_reference
 
 #initialise cluster
 cl<-makeSOCKcluster(2) #number of cores
-new_sequence <- reference
-clusterExport(cl=cl, list=c("vcf_cols", "reference", "length_reference", "new_sequence"))
+clusterExport(cl=cl, list=c("vcf_cols", "reference", "length_reference"))
 
 #substitute variants in parallel
 new_sequence <- parLapply(cl, as.list(1:length(reference)), function(jj){ # run in parallel
   if(any(jj == vcf_cols$POS)){
-    ii <- grep(jj, vcf_cols$POS)
-    new_sequence[vcf_cols$POS[ii]] <- vcf_cols$ALT[ii]
+    return(vcf_cols$ALT[match(jj, vcf_cols$POS)])
     print(paste(paste(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)], collapse=""), "substituted for", vcf_cols$ALT[ii]))
   } else {
-    new_sequence[jj] <- reference[jj]
+    return(reference[jj])
   }
 }) 
-stopCluster()
+stopCluster(cl)
 
 #remove frameshifted variants (serial)
 lapply(1:nrow(vcf_cols), function(ii){
   if(length_reference[ii]>1) new_sequence[(vcf_cols$POS[ii]+1):(vcf_cols$POS[ii]+length_reference[ii]-1)] <- NA
   print(paste(paste(reference[vcf_cols$POS[ii]+1:(vcf_cols$POS[ii]+length_reference[ii]-1)], collapse=""), "removed by indel"))
-})
-
-
-#initialise new sequence
-new_sequence <- reference
-#substitute new variants into fasta sequence
-new_sequence[vcf_cols$POS] <- vcf_cols$ALT #vectorised substitution
-lapply(1:nrow(vcf_cols), function(ii){
-  if(length_reference[ii]==1) print(paste(paste(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)], collapse=""), "substituted for", vcf_cols$ALT[ii]))
-})
-lapply(1:nrow(vcf_cols), function(ii){
-  if(length_reference[ii]>1) new_sequence[(vcf_cols$POS[ii]+1):(vcf_cols$POS[ii]+length_reference[ii]-1)] <- NA
-  print(paste(paste(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)], collapse=""), "substituted for", vcf_cols$ALT[ii]))
 })
 
 #test output
