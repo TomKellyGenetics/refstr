@@ -1,4 +1,5 @@
-#load inpute data
+#load input data
+args = commandArgs(trailingOnly=TRUE)
 reference <- readLines("reference_string.txt")
 vcf_cols <- data.table::fread("output.txt", data.table = F)
 
@@ -11,8 +12,8 @@ names(reference) <- 1:length(reference)
 length_reference <- nchar(vcf_cols$REF)
 length_alternate <- nchar(vcf_cols$ALT)
 #account for missing points as "."
-length_reference [grep("[.]", vcf_cols$REF)] <- 0
-length_alternate [grep("[.]", vcf_cols$ALT)] <- 0
+length_reference[grep("[.]", vcf_cols$REF)] <- 0
+length_alternate[grep("[.]", vcf_cols$ALT)] <- 0
 
 frameshifts <- length_alternate - length_reference
 table(frameshifts) # do we want to provide a text summary of frameshits detected?
@@ -26,6 +27,22 @@ for(ii in 1:nrow(vcf_cols)){
   print(paste(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii]-1)], "substituted for", vcf_cols$ALT[ii]))
 }
 
-head(vcf_cols)
+#test output
+#new_sequence
+#table(sapply(new_sequence, nchar))
+#table(new_sequence)
+#length(new_sequence)
+#length(na.omit(new_sequence))
+#table(is.na(new_sequence))
 
-Sys.getenv('3') #output name from bash
+#remove empty spaces
+new_sequence[grep("[.]", vcf_cols$ALT)] <- NA
+new_sequence <- na.omit(new_sequence) # is this needed
+#concatenate into one string
+new_sequence <- paste(new_sequence, collapse='')
+
+#test fasta
+length(new_sequence)
+nchar(new_sequence)
+
+args[3] #output name from bash
