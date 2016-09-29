@@ -58,6 +58,21 @@ adj_gtf_pos <- cumsum(frameshifts[order(vcf_cols$POS)])
 names(reference)
 vcf_cols$POS
 
+#add starting point to new positions
+if(vcf_cols$POS[1]!=1){
+    position <- c(1, vcf_cols$POS[order(vcf_cols$POS)])
+    adj_gtf_pos <- c(0, adj_gtf_pos)
+  } else {
+   position <- vcf_cols$POS[order(vcf_cols$POS)]
+}
+if(position[length(position)]!=length(reference)){
+  position <- c(position, length(reference))
+} 
+
+
 #new pos
-new_positions <- names(reference)
-sort(vcf_cols$POS)
+new_positions <- as.numeric(names(reference))
+for(ii in 1:(length(position)-1)){
+  new_positions[position[ii]:(position[ii+1]-1)] <-new_positions[position[ii]:(position[ii+1]-1)] + adj_gtf_pos[ii]
+}
+new_positions[length(new_positions)] <- nchar(new_sequence)
