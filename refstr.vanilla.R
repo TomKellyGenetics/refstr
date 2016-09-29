@@ -51,7 +51,7 @@ nchar(new_sequence)
 writeLines(new_sequence, con = paste0(args[4], "_string.txt"))
 
 #read gtf data
-gtf <- data.table::fread(as.character(args[3]), data.table = F)
+gtf <- read.table(as.character(args[3]), header=T, stringsAsFactors=F)
 
 #calculate framshifts
 frameshifts <- length_alternate - length_reference
@@ -88,5 +88,6 @@ new_gtf$V4 <- new_positions[gtf$V4]
 new_gtf$V5 <- new_positions[gtf$V5]
 
 #output gtf file
-write.table(new_gtf, file = paste0(args[4], ".gtf"), header=F, quotes=F)
+write.table(new_gtf, file = paste0(args[4], ".gtf"))
+
 
