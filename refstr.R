@@ -76,3 +76,12 @@ for(ii in 1:(length(position)-1)){
   new_positions[position[ii]:(position[ii+1]-1)] <-new_positions[position[ii]:(position[ii+1]-1)] + adj_gtf_pos[ii]
 }
 new_positions[length(new_positions)] <- nchar(new_sequence)
+
+#substitute new gtf positions #do we want to warn if frameshift within a gene?
+new_gtf <- gtf
+new_gtf$V4 <- new_positions[gtf$V4]
+new_gtf$V5 <- new_positions[gtf$V5]
+
+#output gtf file
+write.table(new_gtf, header=F, quotes=F)
+
