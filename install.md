@@ -1,24 +1,25 @@
-##R
-```shell
-sudo apt-get install r-base
-```
-
-```r
-install.packages(c("snow", "data.table", "readr"))
-```
-
-##python
-```shell
-sudo apt-get install python python-pip
-sudo pip install pandas
-```
-
-##julia
+##Install JuliaLang
 ```shell
 sudo apt-get install julia
 ```
 
-
+##Install Package in Julia
 ```julia
 Pkg.add("DataFrames")
+```
+
+###Install script
+```shell
+nano install.jl
+```
+
+```
+#!/usr/bin/julia
+
+Pkg.add("DataFrames")
+```
+
+```shell
+chown a+r install.jl
+./install.jl
 ```
