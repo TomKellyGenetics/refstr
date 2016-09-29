@@ -9,7 +9,7 @@ reference = open(args[7], 'r').readline()
 
 import numpy as np
 import pandas as pd
-vcf_cols = pd.read_csv(args6[, sep='\t', header=0)
+vcf_cols = pd.read_csv(args[6], sep='\t', header=0)
 
 #split reference string into character vector
 reference = list(reference)
@@ -63,7 +63,6 @@ len(new_sequence)
 
 #args[4] #output name from bash
 open(''.join([args[4], "_string.txt"]), 'w+').write(new_sequence)
-writeLines(new_sequence, con = paste0(args[4], "_string.txt"))
 
 #read gtf data
 #gtf <- data.table::fread(as.character(args[3]), data.table = F)
