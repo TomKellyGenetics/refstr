@@ -25,7 +25,8 @@ adj_gtf_pos <- cumsum(frameshifts)
 # % subs + threshold of frameshifts could be warnings for new assembly / variant calling
 
 #initialise cluster
-cl<-makeSOCKcluster(4) #number of cores
+print(paste("initialise cluster of" args[7], "cores")
+cl<-makeSOCKcluster(as.numeric(args[7])) #number of cores
 clusterExport(cl=cl, list=c("vcf_cols", "reference", "length_reference"))
 
 #substitute variants in parallel

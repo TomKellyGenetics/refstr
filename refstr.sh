@@ -1,8 +1,9 @@
 #! \bin\bash
-# args: input_vcf($1) ref_seq($2) output_name($3) new_fasta_header($4)
+# args: input_vcf($1) ref_seq($2) output_name($3) new_fasta_header($4) cores($5))
 
-echo $2
-echo $1
+#echo $1 input
+#echo $2 reference
+#echo ${5:-1} cores (defaults to 1)
 
 #define intermediate file names
 reference_string=$(echo $2 | sed -e "s/.fasta/_string.txt/")
@@ -22,7 +23,7 @@ grep "#CHROM" $1 > $input_tsv
 sed -n -E -e '/#CHROM/,$ p' $1 | sed '1 d' >> $input_tsv
 sed -i 's/#//g' $input_tsv
 
-Rscript refstr.R "$@" $input_tsv $reference_string #initialise R script and pass pass arguments
+Rscript refstr.R "${@:1:4}" $input_tsv $reference_string ${5:-1} #initialise R script and pass pass arguments
 
 #cut fasta to rows of 60 chars
 fold -w 60 -s ${3}_string.txt > ${3}.fasta
