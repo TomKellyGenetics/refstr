@@ -83,5 +83,5 @@ new_gtf$V4 <- new_positions[gtf$V4]
 new_gtf$V5 <- new_positions[gtf$V5]
 
 #output gtf file
-write.table(new_gtf, header=F, quotes=F)
+write.table(new_gtf, file = paste0(args[4], ".gtf"), header=F, quotes=F)
 
