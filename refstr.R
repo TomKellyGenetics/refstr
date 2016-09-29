@@ -16,6 +16,7 @@ length_alternate <- nchar(vcf_cols$ALT)
 length_alternate[grep("[.]", vcf_cols$ALT)] <- 0
 
 frameshifts <- length_alternate - length_reference
+adj_gtf_pos <- cumsum(frameshifts)
 #table(frameshifts) # do we want to provide a text summary of frameshits detected?
 # % subs + threshold of frameshifts could be warnings for new assembly / variant calling
 
