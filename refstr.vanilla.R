@@ -1,7 +1,7 @@
 #load input data
 args = commandArgs(trailingOnly=TRUE)
-reference <- readLines(as.character(args[6]), warn=F)
-vcf_cols <- read.table(as.character(args[5]), header=T, stringsAsFactors=F)
+reference <- readLines(as.character(args[7]), warn=F)
+vcf_cols <- read.table(as.character(args[6]), header=T, stringsAsFactors=F)
 
 #split reference string into character vector
 reference <- strsplit(reference, split="")[[1]]
@@ -47,6 +47,6 @@ new_sequence <- paste(new_sequence, collapse='')
 length(new_sequence)
 nchar(new_sequence)
 
-#args[3] #output name from bash
-writeLines(new_sequence, con = paste0(args[3], "_string.txt"))
+#args[4] #output name from bash
+writeLines(new_sequence, con = paste0(args[4], "_string.txt"))
 

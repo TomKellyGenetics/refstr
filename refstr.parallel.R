@@ -4,8 +4,8 @@ library("snow")
 
 #load input data
 args = commandArgs(trailingOnly=TRUE)
-reference <- readr::read_lines(as.character(args[6]))
-vcf_cols <- data.table::fread(as.character(args[5]), data.table = F)
+reference <- readr::read_lines(as.character(args[7]))
+vcf_cols <- data.table::fread(as.character(args[6]), data.table = F)
 
 #split reference string into character vector
 reference <- strsplit(reference, split="")[[1]]
@@ -25,8 +25,8 @@ adj_gtf_pos <- cumsum(frameshifts)
 # % subs + threshold of frameshifts could be warnings for new assembly / variant calling
 
 #initialise cluster
-print(paste("initialise cluster of" args[7], "cores")
-cl<-makeSOCKcluster(as.numeric(args[7])) #number of cores
+print(paste("initialise cluster of" args[8], "cores")
+cl<-makeSOCKcluster(as.numeric(args[8])) #number of cores
 clusterExport(cl=cl, list=c("vcf_cols", "reference", "length_reference"))
 
 #substitute variants in parallel
@@ -64,6 +64,6 @@ new_sequence <- paste(new_sequence, collapse='')
 length(new_sequence)
 nchar(new_sequence)
 
-#args[3] #output name from bash
-readr::write_lines(new_sequence, path = paste0(args[3], "_string.txt"))
+#args[4] #output name from bash
+readr::write_lines(new_sequence, path = paste0(args[4], "_string.txt"))
 

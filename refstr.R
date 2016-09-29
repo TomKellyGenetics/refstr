@@ -1,7 +1,7 @@
 #load input data
 args = commandArgs(trailingOnly=TRUE)
-reference <- readLines(as.character(args[6]), warn=F)
-vcf_cols <- data.table::fread(as.character(args[5]), data.table = F)
+reference <- readLines(as.character(args[7]), warn=F)
+vcf_cols <- data.table::fread(as.character(args[6]), data.table = F)
 
 #split reference string into character vector
 reference <- strsplit(reference, split="")[[1]]
@@ -14,11 +14,6 @@ length_alternate <- nchar(vcf_cols$ALT)
 #account for missing points as "."
 #length_reference[grep("[.]", vcf_cols$REF)] <- 0
 length_alternate[grep("[.]", vcf_cols$ALT)] <- 0
-
-frameshifts <- length_alternate - length_reference
-adj_gtf_pos <- cumsum(frameshifts)
-#table(frameshifts) # do we want to provide a text summary of frameshits detected?
-# % subs + threshold of frameshifts could be warnings for new assembly / variant calling
 
 #initialise new sequence
 new_sequence <- reference
@@ -47,6 +42,22 @@ new_sequence <- paste(new_sequence, collapse='')
 length(new_sequence)
 nchar(new_sequence)
 
-#args[3] #output name from bash
-writeLines(new_sequence, con = paste0(args[3], "_string.txt"))
+#args[4] #output name from bash
+writeLines(new_sequence, con = paste0(args[4], "_string.txt"))
 
+#read gtf data
+gtf <- data.table::fread(as.character(args[3]), data.table = F)
+
+#calculate framshifts
+frameshifts <- length_alternate - length_reference
+adj_gtf_pos <- cumsum(frameshifts[order(vcf_cols$POS)])
+#table(frameshifts) # do we want to provide a text summary of frameshits detected?
+# % subs + threshold of frameshifts could be warnings for new assembly / variant calling
+
+#original fasta pos
+names(reference)
+vcf_cols$POS
+
+#new pos
+new_positions <- names(reference)
+sort(vcf_cols$POS)
