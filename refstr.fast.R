@@ -1,7 +1,7 @@
 #load input data
 args = commandArgs(trailingOnly=TRUE)
-reference <- readr::read_lines(as.character(args[6]))
-vcf_cols <- data.table::fread(as.character(args[5]), data.table = F)
+reference <- readr::read_lines(as.character(args[7]))
+vcf_cols <- data.table::fread(as.character(args[6]), data.table = F)
 
 #split reference string into character vector
 reference <- strsplit(reference, split="")[[1]]
@@ -14,11 +14,6 @@ length_alternate <- nchar(vcf_cols$ALT)
 #account for missing points as "."
 #length_reference[grep("[.]", vcf_cols$REF)] <- 0
 length_alternate[grep("[.]", vcf_cols$ALT)] <- 0
-
-frameshifts <- length_alternate - length_reference
-adj_gtf_pos <- cumsum(frameshifts)
-#table(frameshifts) # do we want to provide a text summary of frameshits detected?
-# % subs + threshold of frameshifts could be warnings for new assembly / variant calling
 
 #initialise new sequence
 new_sequence <- reference
@@ -51,6 +46,46 @@ new_sequence <- paste(new_sequence, collapse='')
 length(new_sequence)
 nchar(new_sequence)
 
-#args[3] #output name from bash
-readr::write_lines(new_sequence, path = paste0(args[3], "_string.txt"))
+#args[4] #output name from bash
+readr::write_lines(new_sequence, path = paste0(args[4], "_string.txt"))
+
+#read gtf data
+gtf <- data.table::fread(as.character(args[3]), data.table = F)
+
+#calculate framshifts
+frameshifts <- length_alternate - length_reference
+adj_gtf_pos <- cumsum(frameshifts[order(vcf_cols$POS)])
+#table(frameshifts) # do we want to provide a text summary of frameshits detected?
+# % subs + threshold of frameshifts could be warnings for new assembly / variant calling
+
+#original fasta pos
+names(reference)
+vcf_cols$POS
+
+#add starting point to new positions
+if(vcf_cols$POS[1]!=1){
+    position <- c(1, vcf_cols$POS[order(vcf_cols$POS)])
+    adj_gtf_pos <- c(0, adj_gtf_pos)
+  } else {
+   position <- vcf_cols$POS[order(vcf_cols$POS)]
+}
+if(position[length(position)]!=length(reference)){
+  position <- c(position, length(reference))
+} 
+
+
+#new pos
+new_positions <- as.numeric(names(reference))
+for(ii in 1:(length(position)-1)){
+  new_positions[position[ii]:(position[ii+1]-1)] <-new_positions[position[ii]:(position[ii+1]-1)] + adj_gtf_pos[ii]
+}
+new_positions[length(new_positions)] <- nchar(new_sequence)
+
+#substitute new gtf positions #do we want to warn if frameshift within a gene?
+new_gtf <- gtf
+new_gtf$V4 <- new_positions[gtf$V4]
+new_gtf$V5 <- new_positions[gtf$V5]
+
+#output gtf file
+fwrite(new_gtf, file = paste0(args[4], ".gtf"))
 
