@@ -65,7 +65,7 @@ readr::write_lines(new_sequence, path = paste0(args[4], "_string.txt"))
 #read gtf data
 gtf <- data.table::fread(as.character(args[3]), data.table = F)
 
-#calculate framshifts
+#calculate frameshifts
 frameshifts <- length_alternate - length_reference
 adj_gtf_pos <- cumsum(frameshifts[order(vcf_cols$POS)])
 #table(frameshifts) # do we want to provide a text summary of frameshits detected?
