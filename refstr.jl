@@ -1,9 +1,10 @@
+#!/usr/bin/julia
+
 #load input data
 reference = readline(open(ARGS[7]))
 #Pkg.add("DataFrames")
 using DataFrames
 vcf_cols = readtable(open(ARGS[6]), separator='\t')
-vcf_cols = readdlm(ARGS[6], delim="\t", has_header=true)
 
 #split reference string into character vector
 new_ref = Any[]
@@ -69,8 +70,8 @@ new_sequence = join(new_sequence)
 #nchar(new_sequence)
 
 #ARGS[4] #output name from bash
-open(join([ARGS4[, "_string.txt"])).write(new_sequence)
-write(open(join([ARGS[4], "_string.txt"]), 'w'), new_sequence)
+touch(join([ARGS[4], "_string.txt"]))
+write(open(join([ARGS[4], "_string.txt"]), "w"), new_sequence)
 
 
 #read gtf data

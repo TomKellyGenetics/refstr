@@ -10,3 +10,5 @@ bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta  heade  2
 #python/pandas
 bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta     1.39s user 0.19s system 97% cpu 1.632 total
 
+#julia
+bash refstr.sh examples/output1.vcf examples/reference.fasta   header_julia  17.16s user 2.38s system 76% cpu 25.651 total
