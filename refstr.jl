@@ -112,7 +112,7 @@ for jj in 1:(length(position)-1)
                end
            if frameshifts[jj] > 0
                push!(new_positions, position[jj]+adj_gtf_pos[jj]) #skip ins
-               append!(new_positions, (frameshifts[jj]+position[jj]+adj_gtf_pos[jj-1]+1):(position[jj+1]+adj_gtf_pos[jj]-1)) #skip ins         
+               append!(new_positions, (frameshifts[jj]+position[jj]+adj_gtf_pos[jj-1]+1):(position[jj+1]+adj_gtf_pos[jj]-1)) #skip ins
                end
            if frameshifts[jj] == 0
                append!(new_positions, (position[jj]+adj_gtf_pos[jj]):(position[jj+1]+adj_gtf_pos[jj]-1)) #keep pos for subs
