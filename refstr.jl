@@ -5,6 +5,7 @@ reference = readline(open(ARGS[7]))
 #Pkg.add("DataFrames")
 using DataFrames
 vcf_cols = readtable(open(ARGS[6]), separator='\t')
+vcf_cols = sort(vcf_cols)
 
 #split reference string into character vector
 new_ref = Any[]
@@ -31,17 +32,19 @@ for ii in 1:nrow(vcf_cols)
 #        end
     if vcf_cols[:ALT][ii] == "."
         length_alternate[ii] = 0
+        print(ii)
         end
     end
-
 
 #initialise new sequence
 new_sequence = reference
 #substitute new variants into fasta sequence
 for ii in 1:nrow(vcf_cols)
     new_sequence[vcf_cols[:POS][ii]] = vcf_cols[:ALT][ii]
-        if length_reference[ii] > 1
-            new_sequence[(vcf_cols[:POS][ii]+1):(vcf_cols[:POS][ii]+length_reference[ii])] = "NA"
+        if length_reference[ii] > 2
+            new_sequence[(vcf_cols[:POS][ii]+1):(vcf_cols[:POS][ii]+length_reference[ii])] = "" #NA
+        elseif length_reference[ii] > 1
+            new_sequence[(vcf_cols[:POS][ii]+1)] = "" #NA
             end
     println(vcf_cols[:REF][ii]," substituted for ",vcf_cols[:ALT][ii])    
     end
@@ -55,13 +58,13 @@ for ii in 1:nrow(vcf_cols)
 #table(is.na(new_sequence))
 
 #remove empty space
-new = Any[]
-for seq in new_sequence
-    if seq != "NA"
-        push!(new, seq)
-        end
-    end
-new_sequence = new
+#new = Any[]
+#for seq in new_sequence
+#    if seq != NA
+#        push!(new, seq)
+#        end
+#    end
+#new_sequence = new
 #concatenate into one string
 new_sequence = join(new_sequence)
 
@@ -75,11 +78,12 @@ write(open(join([ARGS[4], "_string.txt"]), "w"), new_sequence)
 
 
 #read gtf data
-#gtf <- data.table::fread(as.character(ARGS[3]), data.table = F)
+gtf = readtable(open(ARGS[3]), separator='\t')
+
 
 #calculate frameshifts
-#frameshifts <- length_alternate - length_reference
-#adj_gtf_pos <- cumsum(frameshifts[order(vcf_cols[:POS])])
+frameshifts = length_alternate - length_reference
+adj_gtf_pos = cumsum(frameshifts)
 #table(frameshifts) # do we want to provide a text summary of frameshits detected?
 # % subs + threshold of frameshifts could be warnings for new assembly / variant calling
 
@@ -87,30 +91,40 @@ write(open(join([ARGS[4], "_string.txt"]), "w"), new_sequence)
 #original_position
 #vcf_cols[:POS]
 
-#add starting point to new positions
-#if(vcf_cols[:POS][1]!=1){
-#    position <- c(1, vcf_cols[:POS][order(vcf_cols[:POS])])
-#    adj_gtf_pos <- c(0, adj_gtf_pos)
-#  } else {
-#   position <- vcf_cols[:POS][order(vcf_cols[:POS])]
-#}
-#if(position[length(position)]!=length(reference)){
-#  position <- c(position, length(reference))
-#} 
 
+#add starting point to new positions
+position = vcf_cols[:POS]
+if vcf_cols[:POS][1] != 1
+    unshift!(position, 1)
+    unshift!(adj_gtf_pos, 0)
+    unshift!(frameshifts, 0)
+    end
+push!(position, length(reference))
 
 #new pos
-#new_positions <- as.numeric(original_position)
-#for(ii in 1:(length(position)-1)){
-#  new_positions[position[ii]:(position[ii+1]-1)] <-new_positions[position[ii]:(position[ii+1]-1)] + adj_gtf_pos[ii]
-#}
-#new_positions[length(new_positions)] <- nchar(new_sequence)
+new_positions = Any[]
+for jj in 1:(length(position)-1)
+           if frameshifts[jj] < 0
+               for i in 1:(-frameshifts[jj])
+                   push!(new_positions, position[jj]+adj_gtf_pos[jj-1]) #repeats for del
+                   end
+               append!(new_positions, (-frameshifts[jj]+position[jj]+adj_gtf_pos[jj]):(position[jj+1]-1+adj_gtf_pos[jj]))
+               end
+           if frameshifts[jj] > 0
+               push!(new_positions, position[jj]+adj_gtf_pos[jj]) #skip ins
+               append!(new_positions, (frameshifts[jj]+position[jj]+adj_gtf_pos[jj-1]+1):(position[jj+1]+adj_gtf_pos[jj]-1)) #skip ins         
+               end
+           if frameshifts[jj] == 0
+               append!(new_positions, (position[jj]+adj_gtf_pos[jj]):(position[jj+1]+adj_gtf_pos[jj]-1)) #keep pos for subs
+               end
+           print(jj)
+           end
 
 #substitute new gtf positions #do we want to warn if frameshift within a gene?
-#new_gtf <- gtf
-#new_gtf$V4 <- new_positions[gtf$V4]
-#new_gtf$V5 <- new_positions[gtf$V5]
+new_gtf = gtf
+new_gtf[:, 4] = new_positions[gtf[:4]]
+new_gtf[:, 5] = new_positions[gtf[:5]]
 
 #output gtf file
-#write.table(new_gtf, file = paste0(ARGS[4], ".gtf"), header=F, quotes=F)
-
+touch(join([ARGS[4], ".gtf"]))
+writetable(join([ARGS[3], ".gtf"]), new_gtf, separator='\t')
