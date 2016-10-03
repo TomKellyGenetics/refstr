@@ -1,4 +1,4 @@
-#!/usr/bin/julia
+#!/usr/bin/env julia
 
 #load input data
 reference = readline(open(ARGS[7]))
@@ -127,4 +127,4 @@ new_gtf[:, 5] = new_positions[gtf[:5]]
 
 #output gtf file
 touch(join([ARGS[4], ".gtf"]))
-writetable(join([ARGS[3], ".gtf"]), new_gtf, separator='\t')
+writetable(join([ARGS[4], ".gtf"]), new_gtf, separator='\t')
