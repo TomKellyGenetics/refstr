@@ -23,7 +23,13 @@ grep "#CHROM" $1 > $input_tsv
 sed -n -E -e '/#CHROM/,$ p' $1 | sed '1 d' >> $input_tsv
 sed -i 's/#//g' $input_tsv
 
+#remove double spaces in gtf
+sed -i "s/  / /g" $3
+
+chmod a+x refstr.jl
 ./refstr.jl "${@:1:5}" $input_tsv $reference_string ${6:-1} #initialise R script and pass pass arguments
+#remove double spaces in gtf
+sed -i "s/  / /g" $3
 
 #cut fasta to rows of 60 chars
 fold -w 60 -s ${4}_string.txt > ${4}.fasta
