@@ -6,6 +6,9 @@ bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta  heade  8
 bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta  heade  27.13s user 0.85s system 33% cpu 1:24.12 total
 #R snow parallel (4 cores)
 bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta  heade  29.07s user 1.60s system 34% cpu 1:29.24 total
+##including gtf
+bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta     9.69s user 0.60s system 86% cpu 11.902 total
+
 
 #python/pandas
 bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta     1.39s user 0.19s system 97% cpu 1.632 total
