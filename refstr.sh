@@ -26,7 +26,7 @@ sed -i 's/#//g' $input_tsv
 #remove double spaces in gtf
 sed -i "s/  / /g" $3
 
-Rscript refstr.vanilla.R "${@:1:5}" $input_tsv $reference_string ${6:-1} #initialise R script and pass pass arguments
+Rscript refstr.faster.R "${@:1:5}" $input_tsv $reference_string ${6:-1} #initialise R script and pass pass arguments
 
 #cut fasta to rows of 60 chars
 fold -w 60 -s ${4}_string.txt > ${4}.fasta

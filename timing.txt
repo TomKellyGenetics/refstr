@@ -19,3 +19,9 @@ bash refstr.sh examples/output1.vcf examples/reference.fasta   header_julia  17.
 bash refstr.sh examples/output1.vcf examples/reference.fasta   header_julia  12.61s user 2.59s system 71% cpu 21.170 total #laptop
 bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta     5.94s user 0.30s system 95% cpu 6.512 total     #home
 
+#R vanilla
+bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta     9.83s user 1.15s system 76% cpu 14.282 total
+#R fast
+bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta     10.08s user 0.98s system 75% cpu 14.558 total
+#R faster
+bash refstr.sh examples/output1.vcf ../refstr/examples/reference.fasta     9.95s user 0.79s system 85% cpu 12.499 total

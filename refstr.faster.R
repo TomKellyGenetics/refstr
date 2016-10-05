@@ -1,3 +1,7 @@
+Rprof("refstr.faster.out", interval = 0.001, memory.profiling = T)
+library("readr")
+library("data.table")
+
 #load input data
 args = commandArgs(trailingOnly=TRUE)
 reference <- readr::read_lines(as.character(args[7]))
@@ -19,14 +23,13 @@ length_alternate[grep("[.]", vcf_cols$ALT)] <- 0
 new_sequence <- reference
 #substitute new variants into fasta sequence
 new_sequence[vcf_cols$POS] <- vcf_cols$ALT #vectorised substitution
-lapply(1:nrow(vcf_cols), function(ii){
-  if(length_reference[ii]==1) print(paste(paste(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii])], collapse=""), "substituted for", vcf_cols$ALT[ii]))
-})
+print(paste(vcf_cols$REF, "substituted for", vcf_cols$ALT))
 #remove frameshifted variants
-lapply(1:nrow(vcf_cols), function(ii){
-  if(length_reference[ii]>1) new_sequence[(vcf_cols$POS[ii]+1):(vcf_cols$POS[ii]+length_reference[ii])] <- NA
-  print(paste(paste(reference[vcf_cols$POS[ii]:(vcf_cols$POS[ii]+length_reference[ii])], collapse=""), "substituted for", vcf_cols$ALT[ii]))
-})
+na_pos <- c()
+for(ii in 1:nrow(vcf_cols)){
+  if(length_reference[ii]>1) na_pos <- c(na_pos, (vcf_cols$POS[ii]+1):(vcf_cols$POS[ii]+length_reference[ii]))
+}
+new_sequence[na_pos] <-NA
 
 #test output
 #new_sequence
@@ -43,8 +46,8 @@ new_sequence <- na.omit(new_sequence) # is this needed
 new_sequence <- paste(new_sequence, collapse='')
 
 #test fasta
-length(new_sequence)
-nchar(new_sequence)
+#length(new_sequence)
+#nchar(new_sequence)
 
 #args[4] #output name from bash
 readr::write_lines(new_sequence, path = paste0(args[4], "_string.txt"))
@@ -59,8 +62,8 @@ adj_gtf_pos <- cumsum(frameshifts[order(vcf_cols$POS)])
 # % subs + threshold of frameshifts could be warnings for new assembly / variant calling
 
 #original fasta pos
-names(reference)
-vcf_cols$POS
+#names(reference)
+#vcf_cols$POS
 
 #add starting point to new positions
 if(vcf_cols$POS[1]!=1){
@@ -87,5 +90,5 @@ new_gtf$V4 <- new_positions[gtf$V4]
 new_gtf$V5 <- new_positions[gtf$V5]
 
 #output gtf file
-data.table:fwrite(new_gtf, file = paste0(args[4], ".gtf"))
+readr::write_tsv(new_gtf, path = paste0(args[4], ".gtf"))
 
